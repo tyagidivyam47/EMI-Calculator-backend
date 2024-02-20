@@ -100,6 +100,7 @@ exports.sendForgotPasswordMail = async (req, res, next) => {
     console.log(userExists);
     if (!userExists) {
       res.status(404).json({ message: "Email not registered" });
+      return;
     }
     let token = await Token.findOne({ userId: userExists._id });
     if (token) {
