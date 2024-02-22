@@ -27,6 +27,7 @@ exports.signup = async (req, res, next) => {
 
     if (existingUser) {
       res.status(403).json({ message: "User with this Email already exists" });
+      return;
     }
     const password = bcrypt.hashSync(rawPassword, 12);
 
@@ -42,9 +43,11 @@ exports.signup = async (req, res, next) => {
     user
       .save()
       .then((result) => {
-        res
-          .status(201)
-          .json({ message: "User created successfully", userId: result._id });
+        next();
+        // this.login();
+        // res
+        //   .status(201)
+        //   .json({ message: "User created successfully", userId: result._id });
       })
       .catch((error) => {
         error.statusCode = 500;
@@ -67,6 +70,7 @@ exports.login = async (req, res, next) => {
 
     if (!existingUser) {
       res.status(401).json({ message: "A user with this email not found" });
+      return;
     }
     const isPassEqual = bcrypt.compareSync(password, existingUser.password);
 
@@ -88,7 +92,6 @@ exports.login = async (req, res, next) => {
     if (!error.statusCode) {
       error.statusCode = 500;
     }
-    next(error);
   }
 };
 
@@ -97,7 +100,7 @@ exports.sendForgotPasswordMail = async (req, res, next) => {
   try {
     const mail = req.params.email;
     const userExists = await User.findOne({ email: mail });
-    console.log(userExists);
+    // console.log(userExists);
     if (!userExists) {
       res.status(404).json({ message: "Email not registered" });
       return;
@@ -157,12 +160,14 @@ exports.resetPassword = async (req, res, next) => {
       res
         .status(410)
         .json({ message: "Invalid or expired password reset link" });
+      return;
     }
     const isValid = await bcrypt.compare(token, passwordResetToken.token);
     if (!isValid) {
       res
         .status(410)
         .json({ message: "Invalid or expired password reset link" });
+      return;
     }
     const hash = await bcrypt.hash(password, 12);
     await User.updateOne(
