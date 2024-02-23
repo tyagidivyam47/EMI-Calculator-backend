@@ -96,7 +96,7 @@ exports.login = async (req, res, next) => {
 };
 
 exports.sendForgotPasswordMail = async (req, res, next) => {
-  const clientUrl = "http://localhost:5173";
+  const clientUrl = "https://emi-calculator-mu.vercel.app";
   try {
     const mail = req.params.email;
     const userExists = await User.findOne({ email: mail });
