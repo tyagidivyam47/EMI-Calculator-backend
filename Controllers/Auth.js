@@ -87,7 +87,11 @@ exports.login = async (req, res, next) => {
       "secretkey",
       { expiresIn: "24hr" }
     );
-    res.status(200).json({ token: token, userId: existingUser._id });
+    const countryCode = existingUser.phone?.charAt(0)
+    const currencySign = countryCode === "9" ? "₹" : countryCode === "1" ? "$" : "₹";
+    // console.log(existingUser.phone)
+    // console.log(countryCode)
+    res.status(200).json({ token: token, userId: existingUser._id, currencySign });
   } catch (error) {
     if (!error.statusCode) {
       error.statusCode = 500;
